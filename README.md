@@ -14,7 +14,7 @@ Starting chatbot:
 from pozdnyakov.chatbot import PozdnyakovChatBot
 
 model = PozdnyakovChatBot() # Wait for model's weights downloading
-print("Привет!") # Output: "Привет!"
+print(model("Привет!")) # Output: "Привет!"
 ```
 
 ## For contributors 💘
