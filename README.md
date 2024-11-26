@@ -4,10 +4,15 @@ AI trained on a [Pozdnyakov channel](https://t.me/+k_Z9AGYLs7g5ZGUy)
 ![Поздняков](https://static10.tgstat.ru/channels/_0/5f/5fbf3b1303c96932a625815726535754.jpg)
 
 # User guide
-Downloading via git clone:
+Install latest PyTorch with CUDA
+```bash
+pip3 install --upgrade torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+```
+Downloading repo via git clone:
 ```bash
 git clone https://github.com/sodeeplearning/Pozdnyakov-Vlad-AI
 cd Pozdnyakov-Vlad-AI
+pip install -r requirements.txt
 ```
 Starting chatbot:
 ```python
@@ -25,7 +30,7 @@ print(model("Привет!")) # Output: "Привет!"
 5) **You're officially part of the project!**
 
 # Team info
-[Vitaly](https://github.com/sodeeplearning) - Head of the project
+[Vitally Petreev](https://github.com/sodeeplearning) - Head of the project
 
 ⚠⚠⚠
 The project team is not responsible for the model's responses. The model was trained on the open-source texts.
