@@ -1,6 +1,4 @@
 transformers
 accelerate
-trl
 bitsandbytes
 torch
-requests
