@@ -7,15 +7,26 @@ from transformers import (
 )
 
 from .utils import download_model
+from .config import system_role, add_assistant_answers_to_history
+
+from .config import (
+    default_checkpoint,
+    default_max_seq,
+    default_saving_dir,
+    default_save_history,
+    default_max_history_size
+)
 
 
 class PozdnyakovChatBot:
     def __init__(
         self,
-        checkpoint: str | int = "3695",
+        checkpoint: str | int = default_checkpoint,
+        saving_dir: str = default_saving_dir,
+        max_seq: int = default_max_seq,
+        save_history: bool = default_save_history,
+        max_history_size: int = default_max_history_size,
         model_path: str = None,
-        saving_dir: str = "weights",
-        max_seq: int = 128
     ):
         """Constructor of PozdnyakovChatBot class.
 
@@ -24,6 +35,7 @@ class PozdnyakovChatBot:
         :param saving_dir: Path to save loaded weights.
         :param max_seq: Max length of generated sequence.
         """
+
         if isinstance(checkpoint, int):
             checkpoint = str(checkpoint)
         if model_path is None:
@@ -31,6 +43,12 @@ class PozdnyakovChatBot:
             model_path = os.path.join(saving_dir, f"checkpoint-{checkpoint}")
 
         self.max_seq = max_seq
+        self.save_history = save_history
+        self.max_history_size = max_history_size
+
+        self.history = [
+            {"role": "system", "content": system_role}
+        ]
 
         self.bnb_config = BitsAndBytesConfig(
             load_in_4bit=True,
@@ -53,6 +71,10 @@ class PozdnyakovChatBot:
             attn_implementation="eager"
         )
 
+    def __update_history(self):
+        self.history = [self.history[0]] + self.history[2:]
+
+
     def generate(self, prompt: str, messages: dict = None) -> str:
         """Get answer to a prompt.
 
@@ -61,9 +83,15 @@ class PozdnyakovChatBot:
         :return: Model's answer.
         """
         if messages is None:
-            messages = [
-                {"role": "user", "content": prompt}
-            ]
+            if not self.save_history:
+                messages = [
+                    {"role": "system", "content": system_role},
+                    {"role": "user", "content": prompt}
+                ]
+            else:
+                self.history.append({"role": "user", "content": prompt})
+                messages = self.history
+
 
         input_ids = self.tokenizer.apply_chat_template(
             messages,
@@ -77,7 +105,15 @@ class PozdnyakovChatBot:
             eos_token_id=self.terminators
         )
         model_response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
-        return model_response[model_response.find("assistant\n") + 11:]
+        processed_response = model_response[model_response.find("assistant\n") + 11:]
+
+        if self.save_history and add_assistant_answers_to_history:
+            self.history.append({"role": "assistant", "content": processed_response})
+        if len(self.history) > self.max_history_size:
+            self.__update_history()
+
+        return processed_response
+
 
     def __call__(self, prompt: str, messages: dict = None) -> str:
         """Get answer to a prompt.
