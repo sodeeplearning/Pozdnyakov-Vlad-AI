@@ -3,7 +3,8 @@ import os, torch
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
-    BitsAndBytesConfig
+    BitsAndBytesConfig,
+    GenerationConfig
 )
 
 from .utils import download_model
@@ -12,9 +13,14 @@ from .config import system_role, add_assistant_answers_to_history
 from .config import (
     default_checkpoint,
     default_max_seq,
+    default_min_seq,
     default_saving_dir,
     default_save_history,
-    default_max_history_size
+    default_max_history_size,
+    default_temperature,
+    default_repetition_penalty,
+    default_do_sample,
+    default_confidence_threshold
 )
 
 
@@ -23,17 +29,30 @@ class PozdnyakovChatBot:
         self,
         checkpoint: str | int = default_checkpoint,
         saving_dir: str = default_saving_dir,
+        model_path: str = None,
+
         max_seq: int = default_max_seq,
+        min_seq: int = default_min_seq,
+        confidence_threshold: float = default_confidence_threshold,
         save_history: bool = default_save_history,
         max_history_size: int = default_max_history_size,
-        model_path: str = None,
+        temperature: float = default_temperature,
+        repetition_penalty: float = default_repetition_penalty,
+        do_sample: bool = default_do_sample
     ):
         """Constructor of PozdnyakovChatBot class.
 
         :param checkpoint: Checkpoint (weights) index.
-        :param model_path: Path to an existing model.
         :param saving_dir: Path to save loaded weights.
+        :param model_path: Path to an existing model.
         :param max_seq: Max length of generated sequence.
+        :param min_seq: Min length of generated sequence.
+        :param confidence_threshold: Min probability of token to generate.
+        :param save_history: 'True' if you need to save you conversations.
+        :param max_history_size: If history size will exceed this value - history will clean every message
+        :param temperature: Value of model's 'creativity'
+        :param repetition_penalty: Value of penalty of repeated words.
+        :param do_sample: Make generations as a sample.
         """
 
         if isinstance(checkpoint, int):
@@ -42,7 +61,6 @@ class PozdnyakovChatBot:
             download_model(checkpoint=checkpoint, saving_dir=saving_dir)
             model_path = os.path.join(saving_dir, f"checkpoint-{checkpoint}")
 
-        self.max_seq = max_seq
         self.save_history = save_history
         self.max_history_size = max_history_size
 
@@ -61,14 +79,24 @@ class PozdnyakovChatBot:
 
         self.terminators = [
             self.tokenizer.eos_token_id,
-            self.tokenizer.convert_tokens_to_ids("<|eot_id|>"),
+            self.tokenizer.convert_tokens_to_ids("<|eot_id|>")
         ]
+
+        self.generation_config = GenerationConfig(
+            temperature=temperature,
+            max_new_tokens=max_seq,
+            min_new_tokens=min_seq,
+            eos_token_id=self.terminators,
+            repetition_penalty=repetition_penalty,
+            do_sample=do_sample,
+            assistant_confidence_threshold=confidence_threshold
+        )
 
         self.model = AutoModelForCausalLM.from_pretrained(
             model_path,
             device_map="auto",
             quantization_config=self.bnb_config,
-            attn_implementation="eager"
+            attn_implementation="eager",
         )
 
     def __update_history(self):
@@ -101,8 +129,7 @@ class PozdnyakovChatBot:
 
         outputs = self.model.generate(
             input_ids,
-            max_new_tokens=self.max_seq,
-            eos_token_id=self.terminators
+            generation_config=self.generation_config
         )
         model_response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
         processed_response = model_response[model_response.find("assistant\n") + 11:]
