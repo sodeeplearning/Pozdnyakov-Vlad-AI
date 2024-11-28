@@ -5,7 +5,10 @@ from pozdnyakov.chatbot import PozdnyakovChatBot
 
 router = Router()
 
-chatbot = PozdnyakovChatBot(save_history=False)
+chatbot = PozdnyakovChatBot(
+    save_history=False,
+    print_dialogues=True
+)
 
 
 @router.message(F.text)

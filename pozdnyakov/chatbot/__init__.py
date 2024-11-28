@@ -20,7 +20,9 @@ from .config import (
     default_temperature,
     default_repetition_penalty,
     default_do_sample,
-    default_confidence_threshold
+    default_confidence_threshold,
+    default_top_k,
+    default_print_dialogues
 )
 
 
@@ -38,7 +40,9 @@ class PozdnyakovChatBot:
         max_history_size: int = default_max_history_size,
         temperature: float = default_temperature,
         repetition_penalty: float = default_repetition_penalty,
-        do_sample: bool = default_do_sample
+        top_k: int = default_top_k,
+        do_sample: bool = default_do_sample,
+        print_dialogues: bool = default_print_dialogues
     ):
         """Constructor of PozdnyakovChatBot class.
 
@@ -52,7 +56,9 @@ class PozdnyakovChatBot:
         :param max_history_size: If history size will exceed this value - history will clean every message
         :param temperature: Value of model's 'creativity'
         :param repetition_penalty: Value of penalty of repeated words.
+        :param top_k: Model will choose only top-15 tokens with the bests probability.
         :param do_sample: Make generations as a sample.
+        :param print_dialogues: 'True' if you need to see all conversations on screen.
         """
 
         if isinstance(checkpoint, int):
@@ -63,6 +69,7 @@ class PozdnyakovChatBot:
 
         self.save_history = save_history
         self.max_history_size = max_history_size
+        self.print_dialogues = print_dialogues
 
         self.history = [
             {"role": "system", "content": system_role}
@@ -89,7 +96,8 @@ class PozdnyakovChatBot:
             eos_token_id=self.terminators,
             repetition_penalty=repetition_penalty,
             do_sample=do_sample,
-            assistant_confidence_threshold=confidence_threshold
+            assistant_confidence_threshold=confidence_threshold,
+            top_k=top_k
         )
 
         self.model = AutoModelForCausalLM.from_pretrained(
@@ -113,7 +121,6 @@ class PozdnyakovChatBot:
         if messages is None:
             if not self.save_history:
                 messages = [
-                    {"role": "system", "content": system_role},
                     {"role": "user", "content": prompt}
                 ]
             else:
@@ -132,7 +139,12 @@ class PozdnyakovChatBot:
             generation_config=self.generation_config
         )
         model_response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+
         processed_response = model_response[model_response.find("assistant\n") + 11:]
+
+        if self.print_dialogues:
+            print(f"User: {prompt}")
+            print(f"Assistant: {processed_response}")
 
         if self.save_history and add_assistant_answers_to_history:
             self.history.append({"role": "assistant", "content": processed_response})
