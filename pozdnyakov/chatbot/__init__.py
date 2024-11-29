@@ -84,6 +84,8 @@ class PozdnyakovChatBot:
 
         self.tokenizer = AutoTokenizer.from_pretrained(model_path)
 
+        self.tokenizer.pad_token_id = self.tokenizer.eos_token_id
+
         self.terminators = [
             self.tokenizer.eos_token_id,
             self.tokenizer.convert_tokens_to_ids("<|eot_id|>")
