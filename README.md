@@ -8,6 +8,10 @@ Install latest PyTorch with CUDA
 ```bash
 pip3 install --upgrade torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
 ```
+Download from PyPi:
+```bash
+pip install pozdnyakov
+```
 Downloading repo via git clone:
 ```bash
 git clone https://github.com/sodeeplearning/Pozdnyakov-Vlad-AI
