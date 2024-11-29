@@ -1,14 +1,12 @@
-from os import path, environ
+from os import path
 
 from setuptools import setup
-from setuptools.config.expand import find_packages
+from setuptools import find_packages
 
 
-__version__ = environ.get('version')
+__version__ = "0.0.5"
 
 project_dir = path.abspath(path.dirname(__file__))
-
-exec(sorted([el if el.startswith('__version__') else 'Z' for el in open('./pozdnyakov/__init__.py', 'r').read().split('\n')], reverse=True)[0])
 
 
 with open(path.join(project_dir, 'README.md'), encoding='utf-8') as f:
@@ -30,7 +28,7 @@ setup(
 
     url="https://github.com/sodeeplearning/Pozdnyakov-Vlad-AI",
 
-    license="MIT License, see LICENSE file",
+    license="MIT License",
 
     packages=find_packages(),
     install_requires=requirements,
