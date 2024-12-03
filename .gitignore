@@ -4,6 +4,7 @@ weights
 
 Untitled.ipynb
 datasets_tts
+training/TTS
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
