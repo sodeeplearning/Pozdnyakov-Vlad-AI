@@ -16,7 +16,7 @@ def formater(root_path, manifest_file, **kwargs):
 
 
 model_name = "tts_models/ru/ru_open_tts/vits"
-output_path = "tts_training"
+output_path = ""
 dataset_config = BaseDatasetConfig(
     formatter="vctk",
     meta_file_train="processed_dataset.json",
