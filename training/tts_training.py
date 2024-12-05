@@ -19,25 +19,25 @@ model_name = "tts_models/ru/ru_open_tts/vits"
 output_path = ""
 dataset_config = BaseDatasetConfig(
     formatter="vctk",
-    meta_file_train="processed_dataset.json",
-    path=r"C:\Users\vital\PycharmProjects\Pozdnyakov-Vlad-AI\dataset\tts_dataset",
+    meta_file_train="processed_tts_dataset.json",
+    path="/home/vitaly/Pozdnyakov-Vlad-AI/dataset/tts_dataset",
     language="ru"
 )
 
 config = VitsConfig(
-    batch_size=128,
-    eval_batch_size=16,
+    batch_size=2,
+    eval_batch_size=1,
     epochs=100,
     text_cleaner="phoneme_cleaners",
     use_phonemes=True,
     phoneme_language="ru",
     phoneme_cache_path="phoneme_cache",
-    print_step=25,
+    print_step=5,
     print_eval=True,
-    mixed_precision=True,
+    mixed_precision=False,
     output_path=output_path,
     datasets=[dataset_config],
-    phonemizer="gruut"
+    phonemizer="gruut",
 )
 model = setup_model(config=config)
 
