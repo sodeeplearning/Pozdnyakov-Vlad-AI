@@ -25,7 +25,7 @@ dataset_config = BaseDatasetConfig(
 )
 
 config = VitsConfig(
-    batch_size=10,
+    batch_size=15,
     eval_batch_size=1,
     epochs=100,
     text_cleaner="phoneme_cleaners",
