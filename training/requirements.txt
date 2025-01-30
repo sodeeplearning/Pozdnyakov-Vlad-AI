@@ -4,9 +4,3 @@ accelerate
 peft
 trl~=0.10.1
 bitsandbytes
-wandb
-requests~=2.32.3
-moviepy
-soundfile
-speechbrain
-gruut[ru]
