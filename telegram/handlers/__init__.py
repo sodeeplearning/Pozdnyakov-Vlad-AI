@@ -1,13 +1,14 @@
 from aiogram import Router, types
 from aiogram.filters.command import Command
 
-from config import hello_message
+from messages import hello_message
 
-from . import prompt
+from . import prompt, quote
 
 
 router = Router()
 
+router.include_router(quote.router)
 router.include_router(prompt.router)
 
 
