@@ -112,6 +112,11 @@ class PozdnyakovChatBot:
     def __update_history(self):
         self.history = [self.history[0]] + self.history[2:]
 
+    @staticmethod
+    def __postprocess_output(model_response: str) -> str:
+        assistant_response = model_response[model_response.find("assistant\n") + 11:]
+        cleaned_assistant_response = assistant_response.replace("_ComCallableWrapper", "").replace("assistant", "")
+        return cleaned_assistant_response
 
     def generate(self, prompt: str, messages: dict = None) -> str:
         """Get answer to a prompt.
@@ -142,7 +147,7 @@ class PozdnyakovChatBot:
         )
         model_response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
 
-        processed_response = model_response[model_response.find("assistant\n") + 11:]
+        processed_response = self.__postprocess_output(model_response)
 
         if self.print_dialogues:
             print(f"User: {prompt}")
