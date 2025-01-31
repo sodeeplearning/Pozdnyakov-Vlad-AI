@@ -1,4 +1,4 @@
-bot_token = ""
+bot_token = "7709491988:AAGx4J-wOYmxrcdnUV4tKQbRJ_Uu9ZH09vs"
 
-hello_message = "Гойдааа!"
-before_answer_message = "Поздняков думает..."
+suggestion_admin = "1003449012"
+best_channel = "@pozdnyak_ai_best"
