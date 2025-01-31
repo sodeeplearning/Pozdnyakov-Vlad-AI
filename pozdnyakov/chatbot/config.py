@@ -7,7 +7,7 @@ add_assistant_answers_to_history = False
 default_saving_dir = "weights"
 default_save_history = False
 default_max_history_size = 7
-default_checkpoint = "3695"
+default_checkpoint = "1000"
 default_print_dialogues = False
 
 default_max_seq = 256

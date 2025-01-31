@@ -115,8 +115,12 @@ class PozdnyakovChatBot:
     @staticmethod
     def __postprocess_output(model_response: str) -> str:
         assistant_response = model_response[model_response.find("assistant\n") + 11:]
-        cleaned_assistant_response = assistant_response.replace("_ComCallableWrapper", "").replace("assistant", "")
-        return cleaned_assistant_response
+        cleaned = assistant_response.replace("assistant", "")
+
+        if "_ComCallableWrapper" in cleaned:
+            cleaned = cleaned[:cleaned.find("_ComCallableWrapper")]
+
+        return cleaned
 
     def generate(self, prompt: str, messages: dict = None) -> str:
         """Get answer to a prompt.
