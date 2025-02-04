@@ -6,7 +6,7 @@ RUN sudo apt-get install -y python3-pip
 WORKDIR /app
 
 COPY ./api/requirements.txt api-reqs.txt
-COPY ./pozdnyakov/requirements.txt pozd-reqs.txt
+COPY ../requirements.txt pozd-reqs.txt
 
 RUN pip3 install -r api-reqs.txt
 RUN pip3 install -r pozd-reqs.txt
