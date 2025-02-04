@@ -23,4 +23,3 @@ async def quote_message(message: Message):
 async def post_message(message: Message):
     if message.reply_to_message and message.chat.id == int(suggestion_admin):
         await message.reply_to_message.forward(chat_id=best_channel)
-        print(message.reply_to_message.reply_to_message)
