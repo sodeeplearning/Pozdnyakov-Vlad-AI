@@ -3,7 +3,7 @@ FROM python:3.12-alpine
 WORKDIR /app
 
 COPY ./telegram/requirements.txt tele-reqs.txt
-COPY ./pozdnyakov/requirements.txt pozd-reqs.txt
+COPY ../requirements.txt pozd-reqs.txt
 
 RUN pip3 install -r tele-reqs.txt
 RUN pip3 install -r pozd-reqs.txt
