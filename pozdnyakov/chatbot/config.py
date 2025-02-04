@@ -12,7 +12,7 @@ default_print_dialogues = False
 
 default_max_seq = 256
 default_min_seq = 32
-default_temperature = 0.7
+default_temperature = 0.1
 default_repetition_penalty = 1.2
 default_do_sample = True
 default_confidence_threshold = 0.4
