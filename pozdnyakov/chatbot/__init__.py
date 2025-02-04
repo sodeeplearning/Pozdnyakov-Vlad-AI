@@ -122,6 +122,15 @@ class PozdnyakovChatBot:
 
         return cleaned
 
+    def clear_history(self) -> None:
+        """Clear history of chatting.
+
+        :return: None.
+        """
+        self.history = [
+            {"role": "system", "content": system_role}
+        ]
+
     def generate(self, prompt: str, messages: dict = None) -> str:
         """Get answer to a prompt.
 

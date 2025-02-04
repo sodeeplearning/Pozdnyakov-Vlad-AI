@@ -3,12 +3,13 @@ from aiogram.filters.command import Command
 
 from messages import hello_message
 
-from . import prompt, quote
+from . import prompt, quote, history
 
 
 router = Router()
 
 router.include_router(quote.router)
+router.include_router(history.router)
 router.include_router(prompt.router)
 
 
