@@ -3,7 +3,7 @@ from aiogram.filters.command import Command
 
 from messages import hello_message
 
-from . import prompt, quote, history, group
+from . import prompt, quote, history, group, info
 
 
 router = Router()
@@ -11,6 +11,7 @@ router = Router()
 router.include_router(quote.router)
 router.include_router(history.router)
 router.include_router(group.router)
+router.include_router(info.router)
 
 router.include_router(prompt.router)
 
