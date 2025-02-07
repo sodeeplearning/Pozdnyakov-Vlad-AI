@@ -31,6 +31,7 @@ class PozdnyakovChatBot:
         self,
         checkpoint: str | int = default_checkpoint,
         saving_dir: str = default_saving_dir,
+        use_cuda: bool = True,
         model_path: str = None,
 
         max_seq: int = default_max_seq,
@@ -48,6 +49,7 @@ class PozdnyakovChatBot:
 
         :param checkpoint: Checkpoint (weights) index.
         :param saving_dir: Path to save loaded weights.
+        :param use_cuda: 'True' if you need to use GPU.
         :param model_path: Path to an existing model.
         :param max_seq: Max length of generated sequence.
         :param min_seq: Min length of generated sequence.
@@ -102,12 +104,17 @@ class PozdnyakovChatBot:
             top_k=top_k
         )
 
-        self.model = AutoModelForCausalLM.from_pretrained(
-            model_path,
-            device_map="auto",
-            quantization_config=self.bnb_config,
-            attn_implementation="eager",
-        )
+        if use_cuda:
+            self.model = AutoModelForCausalLM.from_pretrained(
+                model_path,
+                device_map="auto",
+                quantization_config=self.bnb_config,
+                attn_implementation="eager",
+            )
+        else:
+            self.model = AutoModelForCausalLM.from_pretrained(
+                model_path
+            )
 
     def __update_history(self):
         self.history = [self.history[0]] + self.history[2:]
@@ -172,7 +179,6 @@ class PozdnyakovChatBot:
             self.__update_history()
 
         return processed_response
-
 
     def __call__(self, prompt: str, messages: dict = None) -> str:
         """Get answer to a prompt.
