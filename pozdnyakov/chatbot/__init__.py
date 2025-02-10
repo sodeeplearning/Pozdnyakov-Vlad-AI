@@ -123,7 +123,7 @@ class PozdnyakovChatBot:
 
     @staticmethod
     def __preprocess_input(user_prompt: str) -> str:
-        return user_prompt.replace("/ask", "")
+        return user_prompt.replace("/ask", "").replace("/ask@PozdnyakAIBot", "")
 
     @staticmethod
     def __postprocess_output(model_response: str) -> str:
@@ -144,16 +144,17 @@ class PozdnyakovChatBot:
             {"role": "system", "content": system_role}
         ]
 
-    def generate(self, prompt: str, messages: dict = None) -> str:
+    def generate(self, prompt: str = None, messages: dict = None) -> str:
         """Get answer to a prompt.
 
         :param prompt: Prompt to a model.
         :param messages: History of conversations.
         :return: Model's answer.
         """
-        prompt = self.__preprocess_input(prompt)
+        assert prompt or messages, "Input is empty."
 
         if messages is None:
+            prompt = self.__preprocess_input(prompt)
             if not self.save_history:
                 messages = [
                     {"role": "user", "content": prompt}
@@ -161,6 +162,7 @@ class PozdnyakovChatBot:
             else:
                 self.history.append({"role": "user", "content": prompt})
                 messages = self.history
+
         input_ids = self.tokenizer.apply_chat_template(
             messages,
             add_generation_prompt=True,
