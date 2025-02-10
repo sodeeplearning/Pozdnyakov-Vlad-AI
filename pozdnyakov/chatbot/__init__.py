@@ -1,4 +1,5 @@
-import os, torch
+import os
+import torch
 
 from transformers import (
     AutoModelForCausalLM,
@@ -121,6 +122,10 @@ class PozdnyakovChatBot:
         self.history = [self.history[0]] + self.history[2:]
 
     @staticmethod
+    def __preprocess_input(user_prompt: str) -> str:
+        return user_prompt.replace("/ask", "")
+
+    @staticmethod
     def __postprocess_output(model_response: str) -> str:
         assistant_response = model_response[model_response.find("assistant\n") + 11:]
         cleaned = assistant_response.replace("assistant", "")
@@ -146,6 +151,8 @@ class PozdnyakovChatBot:
         :param messages: History of conversations.
         :return: Model's answer.
         """
+        prompt = self.__preprocess_input(prompt)
+
         if messages is None:
             if not self.save_history:
                 messages = [
@@ -154,8 +161,6 @@ class PozdnyakovChatBot:
             else:
                 self.history.append({"role": "user", "content": prompt})
                 messages = self.history
-
-
         input_ids = self.tokenizer.apply_chat_template(
             messages,
             add_generation_prompt=True,
