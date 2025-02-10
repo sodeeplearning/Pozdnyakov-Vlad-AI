@@ -63,6 +63,7 @@ class PozdnyakovChatBot:
         :param do_sample: Make generations as a sample.
         :param print_dialogues: 'True' if you need to see all conversations on screen.
         """
+        use_cuda = use_cuda and torch.cuda.is_available()
 
         if isinstance(checkpoint, int):
             checkpoint = str(checkpoint)

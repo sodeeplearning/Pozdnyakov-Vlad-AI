@@ -2,3 +2,4 @@ transformers
 accelerate
 bitsandbytes
 torch
+peft
