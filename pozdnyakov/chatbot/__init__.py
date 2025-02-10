@@ -123,7 +123,7 @@ class PozdnyakovChatBot:
 
     @staticmethod
     def __preprocess_input(user_prompt: str) -> str:
-        return user_prompt.replace("/ask", "")
+        return user_prompt.replace("/ask", "").replace("/ask@PozdnyakAIBot", "")
 
     @staticmethod
     def __postprocess_output(model_response: str) -> str:
