@@ -1,4 +1,6 @@
-bot_token = ""
+from os import environ
 
-suggestion_admin = "1003449012"
-best_channel = "@pozdnyak_ai_best"
+bot_token = environ.get('BOT_TOKEN')
+
+suggestion_admin = environ.get('SUGGESTION_ADMIN')
+best_channel = environ.get('BEST_CHANNEL')
