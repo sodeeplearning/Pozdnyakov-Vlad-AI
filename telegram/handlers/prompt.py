@@ -12,7 +12,7 @@ chatbot = PozdnyakovChatBot(
 )
 
 
-@router.message(F.text)
+@router.message(F.text, F.chat.type == 'private')
 async def send_answer(message: types.Message):
     base_answer = await message.answer(before_answer_message)
 
