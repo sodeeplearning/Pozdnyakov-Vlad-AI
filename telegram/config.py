@@ -1,4 +1,4 @@
-bot_token = ""
+bot_token = "7709491988:AAE8szRR-odj49w8vksDhHH6fy5CjlsEMlU"
 
 suggestion_admin = 1003449012
 admins = [1003449012]
