@@ -26,3 +26,9 @@ async def save_logs(message: Message):
 
         await message.answer_document(FSInputFile("logs.json"))
         os.remove("logs.json")
+
+
+@router.message(Command("clearlogs"))
+async def clear_logs(message: Message):
+    if message.chat.id in admins:
+        logs_deque.clear()
