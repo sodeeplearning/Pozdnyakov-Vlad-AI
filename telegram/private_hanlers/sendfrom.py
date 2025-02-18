@@ -29,7 +29,7 @@ async def send_from_pozd(message: Message):
 
 @router.message(Command("forward"))
 async def forward_pozd_answer(message: Message):
-    _, target_id = message.split()
+    _, target_id = message.text.split()
     if message.chat.id in admins and message.reply_to_message:
         await message.reply_to_message.forward(chat_id=target_id)
         await message.reply(forwarded_message)
