@@ -1,6 +1,7 @@
 .idea
 test.py
 weights
+banned.json
 
 Untitled.ipynb
 datasets_tts

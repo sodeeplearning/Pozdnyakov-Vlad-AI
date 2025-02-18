@@ -10,6 +10,7 @@ def add_event(user_message: Message, model_answer):
     logs_deque.append({
         "time": str(datetime.now()),
         "from": user_message.chat.username,
+        "user_id": user_message.chat.id,
         "prompt": user_message.text,
         "answer": model_answer
     })
