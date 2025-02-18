@@ -4,7 +4,7 @@ from aiogram.types import Message
 
 from messages import cleared_message
 
-from .prompt import chatbot
+from bot import chatbot
 
 
 router = Router()
