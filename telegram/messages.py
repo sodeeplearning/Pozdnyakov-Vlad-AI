@@ -32,4 +32,6 @@ admin_commands_message = """Список админских команд:
 /clearlogs - Очистить логи
 /sf {id} : {сообщение} кинуть сообщение от лица Pozdnyakov AI
 /forward {id} Переслать ответ Позднякова от лица Pozdnyakov AI
+/ban {user id} Забанить пользователя по его chat id
+/unban {user id} Разбанить пользоватепля по его chat id
 """
