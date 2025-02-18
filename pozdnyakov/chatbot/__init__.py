@@ -1,4 +1,5 @@
 import os
+from collections import deque
 import torch
 
 from transformers import (
@@ -23,7 +24,6 @@ from .config import (
     default_do_sample,
     default_confidence_threshold,
     default_top_k,
-    default_print_dialogues
 )
 
 
@@ -37,14 +37,13 @@ class PozdnyakovChatBot:
 
         max_seq: int = default_max_seq,
         min_seq: int = default_min_seq,
+        max_history_size: int = default_max_history_size,
         confidence_threshold: float = default_confidence_threshold,
         save_history: bool = default_save_history,
-        max_history_size: int = default_max_history_size,
         temperature: float = default_temperature,
         repetition_penalty: float = default_repetition_penalty,
         top_k: int = default_top_k,
         do_sample: bool = default_do_sample,
-        print_dialogues: bool = default_print_dialogues
     ):
         """Constructor of PozdnyakovChatBot class.
 
@@ -56,12 +55,10 @@ class PozdnyakovChatBot:
         :param min_seq: Min length of generated sequence.
         :param confidence_threshold: Min probability of token to generate.
         :param save_history: 'True' if you need to save you conversations.
-        :param max_history_size: If history size will exceed this value - history will clean every message
         :param temperature: Value of model's 'creativity'
         :param repetition_penalty: Value of penalty of repeated words.
         :param top_k: Model will choose only top-15 tokens with the bests probability.
         :param do_sample: Make generations as a sample.
-        :param print_dialogues: 'True' if you need to see all conversations on screen.
         """
         use_cuda = use_cuda and torch.cuda.is_available()
 
@@ -73,11 +70,11 @@ class PozdnyakovChatBot:
 
         self.save_history = save_history
         self.max_history_size = max_history_size
-        self.print_dialogues = print_dialogues
 
-        self.history = [
+        self.history = deque([
             {"role": "system", "content": system_role}
-        ]
+        ])
+        self.multy_user_history = dict()
 
         self.bnb_config = BitsAndBytesConfig(
             load_in_4bit=True,
@@ -118,9 +115,6 @@ class PozdnyakovChatBot:
                 model_path
             )
 
-    def __update_history(self):
-        self.history = [self.history[0]] + self.history[2:]
-
     @staticmethod
     def __preprocess_input(user_prompt: str) -> str:
         return user_prompt.replace("/ask", "").replace("/ask@PozdnyakAIBot", "")
@@ -135,14 +129,49 @@ class PozdnyakovChatBot:
 
         return cleaned
 
-    def clear_history(self) -> None:
+    def __update_history(self, user_id: int = None) -> None:
+        if user_id is None:
+            if len(self.history) > self.max_history_size:
+                self.history.popleft()
+                self.history.popleft()
+                self.history.appendleft({"role": "system", "content": system_role})
+
+        else:
+            if len(self.multy_user_history[user_id]) > self.max_history_size:
+                self.multy_user_history[user_id].popleft()
+                self.multy_user_history[user_id].popleft()
+                self.multy_user_history[user_id].appendleft(
+                    {"role": "system", "content": system_role}
+                )
+
+    def clear_history(self, user_id: str = None) -> None:
         """Clear history of chatting.
 
         :return: None.
         """
-        self.history = [
-            {"role": "system", "content": system_role}
-        ]
+        if user_id is None:
+            self.history = deque([
+                {"role": "system", "content": system_role}
+            ])
+        else:
+            del self.multy_user_history[user_id]
+
+    def __answer(self, messages: dict) -> str:
+        input_ids = self.tokenizer.apply_chat_template(
+            messages,
+            add_generation_prompt=True,
+            return_tensors="pt"
+        ).to(self.model.device)
+
+        outputs = self.model.generate(
+            input_ids,
+            generation_config=self.generation_config
+        )
+        model_response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+        processed_response = self.__postprocess_output(model_response)
+
+        return processed_response
 
     def generate(self, prompt: str = None, messages: dict = None) -> str:
         """Get answer to a prompt.
@@ -163,30 +192,16 @@ class PozdnyakovChatBot:
                 self.history.append({"role": "user", "content": prompt})
                 messages = self.history
 
-        input_ids = self.tokenizer.apply_chat_template(
-            messages,
-            add_generation_prompt=True,
-            return_tensors="pt"
-        ).to(self.model.device)
+        answer = self.__answer(messages=messages)
 
-        outputs = self.model.generate(
-            input_ids,
-            generation_config=self.generation_config
-        )
-        model_response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
-
-        processed_response = self.__postprocess_output(model_response)
-
-        if self.print_dialogues:
-            print(f"User: {prompt}")
-            print(f"Assistant: {processed_response}")
-
-        if self.save_history and add_assistant_answers_to_history:
-            self.history.append({"role": "assistant", "content": processed_response})
-        if len(self.history) > self.max_history_size:
+        if self.save_history:
+            self.history.append({"role": "user", "content": prompt})
+            if add_assistant_answers_to_history:
+                self.history.append({"role": "assistant", "content": answer})
             self.__update_history()
 
-        return processed_response
+        return answer
+
 
     def __call__(self, prompt: str, messages: dict = None) -> str:
         """Get answer to a prompt.
@@ -199,3 +214,30 @@ class PozdnyakovChatBot:
             prompt=prompt,
             messages=messages
         )
+
+    def multy_user_prompt(self, prompt: str, user_id: int) -> str:
+        """Get answer to a prompt in a context with several users.
+
+        :param prompt: Prompt to a model.
+        :param user_id: ID of user using the model.
+        :return: Model's answer.
+        """
+        if user_id not in self.multy_user_history:
+            self.multy_user_history[user_id] = deque([
+                {"role": "system", "content": system_role},
+                {"role": "user", "content": prompt}
+            ])
+        else:
+            self.multy_user_history[user_id].append(
+                {"role": "user", "content": prompt}
+            )
+
+        answer = self.__answer(messages=self.multy_user_history[user_id])
+        answer = answer[answer.rfind("\n") + 1:]
+
+        self.multy_user_history[user_id].append(
+            {"role": "assistant", "content": answer}
+        )
+        self.__update_history(user_id=user_id)
+
+        return answer
