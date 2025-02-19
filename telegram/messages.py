@@ -12,6 +12,7 @@ incorrect_user_id = "Команда написана неправильно ил
 banned_user = "Пошел нахуй, ты забанен :)"
 user_has_been_banned = "Вы забанили пользователя!"
 user_has_been_unbanned = "Вы разбанили пользователя!"
+all_history_cleared = "Поздняков забыл о чем говорил вообще со всеми."
 
 info_message = """Pozdnyakov AI - произведение искусства и революция в мире искусственного интеллекта.
 При этом доступно оно всем - https://github.com/sodeeplearning/Pozdnyakov-Vlad-AI
@@ -34,4 +35,5 @@ admin_commands_message = """Список админских команд:
 /forward {id} Переслать ответ Позднякова от лица Pozdnyakov AI
 /ban {user id} Забанить пользователя по его chat id
 /unban {user id} Разбанить пользоватепля по его chat id
+/absclear Очистить ВСЮ историю сообщений с пользователями
 """
