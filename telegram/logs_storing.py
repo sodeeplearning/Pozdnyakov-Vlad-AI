@@ -23,3 +23,4 @@ def add_event(user_message: Message, model_answer, print_logs: bool = True):
 logs_deque = deque()
 history = dict()
 quote_history = dict()
+failed_requests_amount = dict()
