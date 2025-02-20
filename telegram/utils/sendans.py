@@ -11,22 +11,22 @@ from bans import is_banned
 async def send_model_answer(message: Message):
     if is_banned(message.chat.id):
         await message.reply(banned_user)
-        return
-
-    if message.chat.id not in history or (datetime.now() - history[message.chat.id]).seconds > min_latency:
-        base_answer = await message.answer(before_answer_message)
-
-        model_answer = chatbot.multy_user_prompt(
-            prompt=message.text,
-            user_id=message.chat.id
-        )
-
-        await base_answer.delete()
-        await message.reply(model_answer)
-
-        history[message.chat.id] = datetime.now()
-        add_event(message, model_answer)
 
     else:
-        time_remaining = min_latency - (datetime.now() - history[message.chat.id]).seconds
-        await message.reply(too_frequently_message + str(time_remaining))
+        if message.chat.id not in history or (datetime.now() - history[message.chat.id]).seconds > min_latency:
+            base_answer = await message.answer(before_answer_message)
+
+            model_answer = chatbot.multy_user_prompt(
+                prompt=message.text,
+                user_id=message.chat.id
+            )
+
+            history[message.chat.id] = datetime.now()
+            add_event(message, model_answer)
+
+            await base_answer.delete()
+            await message.reply(model_answer)
+
+        else:
+            time_remaining = min_latency - (datetime.now() - history[message.chat.id]).seconds
+            await message.reply(too_frequently_message + str(time_remaining))
