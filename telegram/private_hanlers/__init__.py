@@ -1,6 +1,6 @@
 from aiogram import Router
 
-from . import post, sendfrom, logs, admin_info, ban
+from . import post, sendfrom, logs, admin_info, ban, history
 
 
 router = Router()
@@ -10,3 +10,4 @@ router.include_router(sendfrom.router)
 router.include_router(logs.router)
 router.include_router(admin_info.router)
 router.include_router(ban.router)
+router.include_router(history.router)
