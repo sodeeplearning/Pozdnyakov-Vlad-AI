@@ -6,7 +6,7 @@ from aiogram.types import Message
 from config import max_logs_size
 
 
-def add_event(user_message: Message, model_answer):
+def add_event(user_message: Message, model_answer, print_logs: bool = True):
     logs_deque.append({
         "time": str(datetime.now()),
         "from": user_message.chat.username,
@@ -14,6 +14,8 @@ def add_event(user_message: Message, model_answer):
         "prompt": user_message.text,
         "answer": model_answer
     })
+    if print_logs:
+        print(logs_deque[-1])
     if len(logs_deque) > max_logs_size:
         logs_deque.popleft()
 
