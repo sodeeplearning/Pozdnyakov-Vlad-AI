@@ -1,4 +1,6 @@
-bot_token = ""
+import os
+
+bot_token = os.environ.get("BOT_TOKEN")
 
 suggestion_admin = 1003449012
 admins = [1003449012]
